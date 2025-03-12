@@ -94,9 +94,17 @@ export const swaggerSpec = {
                           type: "integer",
                           example: 360
                         },
+                        seconds: {
+                          type: "integer",
+                          example: 45
+                        },
+                        hours: {
+                          type: "integer",
+                          example: 6
+                        },
                         formatted: {
                           type: "string",
-                          example: "6h 0m"
+                          example: "6h 0m 45s"
                         }
                       }
                     },
@@ -240,9 +248,17 @@ export const swaggerSpec = {
             type: "string",
             example: "12/03/2025, 06:52:21"
           },
+          hours_spent: {
+            type: "integer",
+            example: 6
+          },
           minutes_spent: {
             type: "integer",
-            example: 360
+            example: 0
+          },
+          seconds_spent: {
+            type: "integer",
+            example: 0
           },
           created_at: {
             type: "string",
