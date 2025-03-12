@@ -57,7 +57,7 @@ trabep-client/
 1. Clone this repository:
    ```bash
    git clone https://github.com/Brenaki/trabep-client.git
-   cd trabEP
+   cd trabep-client
    ```
 
 2. Set up the API:
