@@ -3,9 +3,9 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start": "bun run build/index.js",
     "dev": "bun run --watch src/index.ts",
-    "build": "bun build src/ --outdir dist"
+    "build": "bun build --target=bun src/index.ts --outdir ./build"
   },
   "devDependencies": {
     "@types/bun": "latest"

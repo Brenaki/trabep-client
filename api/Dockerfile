@@ -1,5 +1,5 @@
 # Use the official Bun image as base
-FROM oven/bun:1.0 as base
+FROM oven/bun:1.1.26-debian
 
 # Set working directory
 WORKDIR /app
@@ -8,16 +8,16 @@ WORKDIR /app
 COPY package.json bun.lockb tsconfig.json ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
-COPY src/ ./src/
-
-# Create data directory for SQLite database
-RUN mkdir -p data
+COPY . .
 
 # Expose the port the app runs on
 EXPOSE 3000
+
+# Build application
+RUN bun run build
 
 # Set environment variables
 ENV NODE_ENV=production
