@@ -12,6 +12,11 @@ import (
 )
 
 func main() {
+	// Load environment variables from .env file
+	if err := config.LoadEnv(); err != nil {
+		fmt.Printf("Warning: Error loading .env file: %v\n", err)
+	}
+
 	// Get current time in the required format for the API
 	currentTime := time.Now().Format("02/01/2006, 15:04:05")
 	fmt.Printf("Current time: %s\n", currentTime)
