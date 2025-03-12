@@ -6,26 +6,55 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/Brenaki/trabep-client/client/models"
 )
 
-const (
-	// BaseURL is the API endpoint base URL
-	BaseURL = "http://localhost:3000"
-)
+// getBaseURL returns the API base URL from environment variable or default
+func getBaseURL() string {
+	// Try to get URL from environment variable
+	if envURL := os.Getenv("URL"); envURL != "" {
+		return envURL
+	}
+	// Fall back to default localhost URL
+	return "http://localhost:3000"
+}
 
-// SendToAPI sends the time record to the API
-// Parameters:
-// - user: The username for the time record
-// - startTime: The start time in format "DD/MM/YYYY, HH:MM:SS"
-// - endTime: The end time in format "DD/MM/YYYY, HH:MM:SS"
-// Returns an error if the API request fails
+// getAPIEndpoint returns the API endpoint path from environment variable or default
+func getAPIEndpoint() string {
+	// Try to get endpoint from environment variable
+	if endpoint := os.Getenv("API_ENDPOINT"); endpoint != "" {
+		return endpoint
+	}
+	// Fall back to default endpoint
+	return "/user-times"
+}
+
+// SendToAPI sends time tracking data to the API
 func SendToAPI(user, startTime, endTime string) error {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
+	// Get base URL from environment or default
+	baseURL := getBaseURL()
+	
+	// Ensure the base URL doesn't end with a trailing slash
+	baseURL = strings.TrimSuffix(baseURL, "/")
+	
+	// Get API endpoint from environment or default
+	endpoint := getAPIEndpoint()
+	
+	// Ensure endpoint starts with a slash
+	if !strings.HasPrefix(endpoint, "/") {
+		endpoint = "/" + endpoint
+	}
+	
+	// Construct the full URL
+	fullURL := baseURL + endpoint
 
 	// Prepare request data
 	requestData := models.CreateRecordRequest{
@@ -37,11 +66,11 @@ func SendToAPI(user, startTime, endTime string) error {
 	// Convert request data to JSON
 	jsonData, err := json.Marshal(requestData)
 	if err != nil {
-		return fmt.Errorf("failed to marshal request: %w", err)
+		return fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
 	// Send POST request to API
-	resp, err := client.Post(BaseURL+"/user-times", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := client.Post(fullURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("failed to make request: %w", err)
 	}
