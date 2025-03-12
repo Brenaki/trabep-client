@@ -1,4 +1,4 @@
-module github.com/Brenaki/trabep-client
+module github.com/Brenaki/trabep-client/client
 
 go 1.21
 

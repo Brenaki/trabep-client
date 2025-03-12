@@ -5,82 +5,66 @@ import (
 	"os"
 	"time"
 
-	"github.com/Brenaki/trabep-client/api"
-	"github.com/Brenaki/trabep-client/models"
-	"github.com/Brenaki/trabep-client/queue"
-	"github.com/gen2brain/beeep"
+	"github.com/Brenaki/trabep-client/client/api"
+	"github.com/Brenaki/trabep-client/client/config"
+	"github.com/Brenaki/trabep-client/client/notification"
+	"github.com/Brenaki/trabep-client/client/session"
 )
 
 func main() {
-	// Get queue file path
-	queueFilePath, err := queue.GetQueueFilePath()
-	if err != nil {
-		fmt.Println("Error getting executable path:", err)
-		os.Exit(1)
-	}
-
-	// Get current time in the required format
+	// Get current time in the required format for the API
 	currentTime := time.Now().Format("02/01/2006, 15:04:05")
-	fmt.Printf("Recording time entry: %s\n", currentTime)
+	fmt.Printf("Current time: %s\n", currentTime)
 
-	// Load existing queue
-	timeQueue, err := queue.LoadQueue(queueFilePath)
+	// Check if there's an existing session
+	startTime, err := session.CheckExistingSession()
 	if err != nil {
-		// If file doesn't exist, create a new queue
-		timeQueue = models.TimeQueue{
-			Entries: []models.TimeEntry{},
-			User:    queue.DefaultUser,
-		}
-	}
-
-	// Add current time to queue
-	queue.AddEntry(&timeQueue, currentTime)
-	fmt.Printf("Added to queue. Queue now has %d entries.\n", len(timeQueue.Entries))
-
-	// Save updated queue
-	if err := queue.SaveQueue(queueFilePath, timeQueue); err != nil {
-		fmt.Println("Error saving queue:", err)
+		fmt.Printf("Error checking session: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Show notification for first entry
-	if len(timeQueue.Entries) == 1 {
-		err = beeep.Notify("Time Tracker", "First time entry recorded. Run again to complete the time tracking.", "")
-		if err != nil {
+	if startTime == "" {
+		// No existing session, create a new one
+		fmt.Println("Starting new time tracking session...")
+		
+		// Save the current time as the session start time
+		if err := session.SaveSession(currentTime); err != nil {
+			fmt.Printf("Error saving session: %v\n", err)
+			os.Exit(1)
+		}
+		
+		// Show notification for session start
+		if err := notification.NotifySessionStart(); err != nil {
 			fmt.Println("Error showing notification:", err)
 		}
-	}
-
-	// If we have 2 or more entries, process them
-	if queue.HasTwoOrMoreEntries(timeQueue) {
-		fmt.Println("Queue has 2 entries. Processing...")
 		
-		// Take the first two entries
-		startTime := timeQueue.Entries[0].Timestamp
-		endTime := timeQueue.Entries[1].Timestamp
+		fmt.Println("Session started. Run the program again to complete time tracking.")
+	} else {
+		// Existing session found, complete it
+		fmt.Printf("Continuing session started at: %s\n", startTime)
+		fmt.Println("Completing time tracking session...")
 		
-		// Send to API
-		if err := api.SendToAPI(timeQueue.User, startTime, endTime); err != nil {
+		// Send time record to API
+		if err := api.SendToAPI(config.GetUsername(), startTime, currentTime); err != nil {
 			fmt.Printf("Error sending to API: %v\n", err)
 			
 			// Show error notification
-			beeep.Alert("Time Tracker Error", "Failed to send time record to API.", "")
+			notification.NotifyError("Failed to send time record to API.")
 		} else {
 			fmt.Println("Successfully sent time record to API!")
 			
 			// Show success notification
-			beeep.Notify("Time Tracker", "Time record successfully sent to API!", "")
+			if err := notification.NotifySessionComplete(); err != nil {
+				fmt.Println("Error showing notification:", err)
+			}
 			
-			// Clear the queue after successful submission
-			queue.ClearQueue(&timeQueue)
-			if err := queue.SaveQueue(queueFilePath, timeQueue); err != nil {
-				fmt.Println("Error clearing queue:", err)
+			// Delete the session file
+			if err := session.DeleteSession(); err != nil {
+				fmt.Printf("Error deleting session: %v\n", err)
 			} else {
-				fmt.Println("Queue cleared successfully.")
+				fmt.Println("Session file deleted successfully.")
 			}
 		}
-	} else {
-		fmt.Println("Waiting for one more entry before sending to API.")
 	}
 
 	// Keep console open for a moment so user can see the output
