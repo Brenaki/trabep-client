@@ -1,7 +1,12 @@
-import { records } from "../db/get-all-datas";
+import { getDatabase } from "../db/create-database";
 
 export function getTimes(): Response {
   try {
+
+    const db = getDatabase();
+
+    // Query all records from the user_times table
+    const records = db.query("SELECT * FROM user_times ORDER BY created_at DESC").all();
    
     // Return the records as JSON
     return new Response(

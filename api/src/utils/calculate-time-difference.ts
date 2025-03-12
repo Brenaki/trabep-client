@@ -2,9 +2,14 @@
  * Calculates the time difference between two timestamps
  * @param startTime - Date string in format "DD/MM/YYYY, HH:MM:SS"
  * @param endTime - Date string in format "DD/MM/YYYY, HH:MM:SS"
- * @returns Object containing minutes (total minutes) and formatted (human-readable format)
+ * @returns Object containing hours, minutes, seconds, and formatted time
  */
-export function calculateTimeDifference(startTime: string, endTime: string): { minutes: number, formatted: string } {
+export function calculateTimeDifference(startTime: string, endTime: string): { 
+    hours: number,
+    minutes: number, 
+    seconds: number,
+    formatted: string 
+} {
     // Parse date strings to Date objects
     const parseDate = (dateStr: string): Date => {
         // Split the date string into date and time parts
@@ -24,13 +29,16 @@ export function calculateTimeDifference(startTime: string, endTime: string): { m
     // Calculate difference in milliseconds
     const diffMs = end.getTime() - start.getTime();
     
-    // Convert to minutes
-    const minutes = Math.floor(diffMs / 60000);
+    // Convert to total seconds
+    const totalSeconds = Math.floor(diffMs / 1000);
     
-    // Format as hours and minutes
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    const formatted = `${hours}h ${remainingMinutes}m`;
+    // Calculate hours, minutes and remaining seconds
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
     
-    return { minutes, formatted };
+    // Format as hours, minutes and seconds
+    const formatted = `${hours}h ${minutes}m ${seconds}s`;
+    
+    return { hours, minutes, seconds, formatted };
 }

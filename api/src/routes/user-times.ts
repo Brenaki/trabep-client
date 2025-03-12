@@ -31,7 +31,12 @@ export async function handleUserTimeData(req: Request) {
         );
          
         // Save the data to the database
-        const savedToDb = saveUserTimeToDatabase(validatedData, timeDifference.minutes);
+        const savedToDb = saveUserTimeToDatabase(
+            validatedData, 
+            timeDifference.hours,
+            timeDifference.minutes,
+            timeDifference.seconds
+        );
         
         // Return success response with time calculation
         return new Response(
@@ -40,7 +45,9 @@ export async function handleUserTimeData(req: Request) {
                 message: "Data received successfully",
                 data: validatedData,
                 timeSpent: {
+                    hours: timeDifference.hours,
                     minutes: timeDifference.minutes,
+                    seconds: timeDifference.seconds,
                     formatted: timeDifference.formatted
                 },
                 savedToDatabase: savedToDb
