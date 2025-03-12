@@ -9,10 +9,12 @@ A simple and efficient API for tracking time spent on activities. Built with Bun
 - Store time records in a SQLite database
 - RESTful API with JSON responses
 - Swagger UI documentation
+- Docker support for easy deployment
 
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (v1.0.0 or higher)
+- [Docker](https://www.docker.com/) (optional, for containerized deployment)
 
 ## Installation
 
@@ -39,6 +41,32 @@ bun run start
 ```
 
 The API will be available at http://localhost:3000.
+
+## Docker Deployment
+
+The API includes a Dockerfile for containerized deployment:
+
+### Building the Docker image
+
+```bash
+docker build -t time-tracking-api .
+```
+
+### Running the Docker container
+
+```bash
+docker run -p 3000:3000 -d --name time-tracking-api time-tracking-api
+```
+
+### Persisting data with Docker volumes
+
+To persist the database data between container restarts:
+
+```bash
+docker run -p 3000:3000 -v time-tracker-data:/app/data -d --name time-tracking-api time-tracking-api
+```
+
+This creates a Docker volume named `time-tracker-data` that will store your database files.
 
 ## API Documentation
 
