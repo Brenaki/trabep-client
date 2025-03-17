@@ -1,12 +1,13 @@
 import { getDatabase } from "../db/create-database";
+import { userTimes } from "../db/schema";
+import { desc } from "drizzle-orm";
 
-export function getTimes(): Response {
+export async function getTimes(): Promise<Response> {
   try {
-
     const db = getDatabase();
 
-    // Query all records from the user_times table
-    const records = db.query("SELECT * FROM user_times ORDER BY created_at DESC").all();
+    // Query all records from the user_times table using Drizzle ORM
+    const records = await db.select().from(userTimes).orderBy(desc(userTimes.createdAt));
    
     // Return the records as JSON
     return new Response(
