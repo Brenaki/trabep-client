@@ -1,17 +1,17 @@
 import { handleUserTimeData } from "./routes/user-times";
-import { initializeDatabase } from "./db/create-database";
 import { getTimes } from "./routes/get-times";
 import { serveSwaggerUI } from "./routes/swagger-ui";
 import { handleDeleteTime } from "./routes/delete-time";
+import { getDatabase } from "./db/create-database";
 
 // Initialize the database when the server starts
 console.log("Initializing database...");
-const db = initializeDatabase();
+const db = getDatabase();
 console.log("Database initialized successfully!");
 
 Bun.serve({
     port: 3000,
-    fetch(req) {
+    async fetch(req) {
         const url = new URL(req.url);
         const pathname = url.pathname;
         
@@ -28,11 +28,11 @@ Bun.serve({
         // Handle the user data routes
         if (pathname === "/user-times") {
             if (req.method === "POST") {
-                return handleUserTimeData(req);
+                return await handleUserTimeData(req);
             } else if (req.method === "GET") {
-                return getTimes();
+                return await getTimes();
             } else if (req.method === "DELETE") {
-                return handleDeleteTime(req);
+                return await handleDeleteTime(req);
             } else {
                 return new Response("Method Not Allowed", { status: 405 });
             }
