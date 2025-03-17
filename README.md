@@ -23,26 +23,49 @@ The Time Tracker project consists of two main components:
 
 ```
 trabep-client/
-├── api/                  # Backend API server
-│   ├── data/             # Database files
-│   ├── src/              # Source code
-│   │   ├── db/           # Database operations
-│   │   ├── routes/       # API endpoints
-│   │   ├── swagger/      # API documentation
-│   │   ├── utils/        # Utility functions
-│   │   └── index.ts      # Main entry point
-│   ├── package.json      # Dependencies and scripts
-│   └── tsconfig.json     # TypeScript configuration
-│
-└── client/               # Desktop client application
-    ├── api/              # API client code
-    ├── config/           # Configuration utilities
-    ├── models/           # Data models
-    ├── notification/     # Desktop notifications
-    ├── session/          # Session management
-    ├── main.go           # Main entry point
-    └── go.mod            # Go module definition
+    ├── README.md
+    ├── api                                                # Backend API server
+    │   ├── .dockerignore
+    │   ├── .gitignore
+    │   ├── Dockerfile
+    │   ├── README.md
+    │   ├── bun.lockb
+    │   ├── package.json                                  # Dependencies and scripts
+    │   ├── src                                           # Source code
+    │   │   ├── db                                        # Database operations
+    │   │   │   ├── create-database.ts
+    │   │   │   └── save-user-time-to-database.ts
+    │   │   ├── index.ts
+    │   │   ├── routes                                    # API endpoints
+    │   │   │   ├── delete-time.ts
+    │   │   │   ├── get-times.ts
+    │   │   │   ├── swagger-ui.ts
+    │   │   │   ├── user-time-data.dto.ts
+    │   │   │   └── user-times.ts
+    │   │   ├── swagger                                   # API documentation
+    │   │   │   └── swagger.ts
+    │   │   └── utils                                     # Utility functions
+    │   │   │   └── calculate-time-difference.ts
+    │   └── tsconfig.json                                 # TypeScript configuration
+    └── client                                             # Desktop client application
+        ├── .gitignore
+        ├── README.md
+        ├── api                                           # API client code
+        │   └── client.go
+        ├── config                                        # Configuration utilities
+        │   ├── config.go
+        │   └── env.go
+        ├── go.mod                                        # Go module definition
+        ├── go.sum
+        ├── main.go                                       # Main entry point
+        ├── models                                        # Data models
+        │   └── types.go
+        ├── notification                                  # Desktop notifications
+        │   └── notifier.go
+        └── session                                       # Session management
+            └── manager.go
 ```
+
 
 ## Getting Started
 
