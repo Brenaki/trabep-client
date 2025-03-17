@@ -24,7 +24,7 @@ The Time Tracker project consists of two main components:
 ```
 trabep-client/
     ├── README.md
-    ├── api                                                # Backend API server
+    ├── api                                               # Backend API server
     │   ├── .dockerignore
     │   ├── .gitignore
     │   ├── Dockerfile
@@ -47,7 +47,7 @@ trabep-client/
     │   │   └── utils                                     # Utility functions
     │   │   │   └── calculate-time-difference.ts
     │   └── tsconfig.json                                 # TypeScript configuration
-    └── client                                             # Desktop client application
+    └── client                                            # Desktop client application
         ├── .gitignore
         ├── README.md
         ├── api                                           # API client code
