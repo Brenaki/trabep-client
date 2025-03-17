@@ -1,18 +1,20 @@
+import { eq } from 'drizzle-orm';
 import { getDatabase } from "../db/create-database";
+import { userTimes } from '../db/schema';
 
 /**
  * Deletes a time record by ID
  * @param id The ID of the record to delete
  * @returns Response with the result of the operation
  */
-export function deleteTimeById(id: number): Response {
+export async function deleteTimeById(id: number): Promise<Response> {
   try {
     const db = getDatabase();
     
     // Check if the record exists
-    const record = db.query("SELECT id FROM user_times WHERE id = ?").get(id);
+    const records = await db.select().from(userTimes).where(eq(userTimes.id, id));
     
-    if (!record) {
+    if (!records.length) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -25,9 +27,8 @@ export function deleteTimeById(id: number): Response {
       );
     }
     
-    // Delete the record
-    const stmt = db.prepare("DELETE FROM user_times WHERE id = ?");
-    stmt.run(id);
+    // Delete the record using Drizzle ORM
+    await db.delete(userTimes).where(eq(userTimes.id, id));
     
     return new Response(
       JSON.stringify({
@@ -60,7 +61,7 @@ export function deleteTimeById(id: number): Response {
  * @param req The request object
  * @returns Response with the result of the operation
  */
-export function handleDeleteTime(req: Request): Response {
+export async function handleDeleteTime(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const idParam = url.searchParams.get("id");
   
@@ -92,5 +93,5 @@ export function handleDeleteTime(req: Request): Response {
     );
   }
   
-  return deleteTimeById(id);
+  return await deleteTimeById(id);
 }
