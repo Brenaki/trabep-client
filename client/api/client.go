@@ -92,7 +92,14 @@ func SendToAPI(user, startTime, endTime string) error {
 	}
 
 	// Parse response
-	var response models.CreateRecordResponse
+	var response struct {
+		Success         bool      `json:"success"`
+		Message         string    `json:"message"`
+		Data            models.UserData  `json:"data"`
+		TimeSpent       models.TimeSpent `json:"timeSpent"`
+		SavedToDatabase interface{} `json:"savedToDatabase"`
+	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return fmt.Errorf("failed to decode response: %w", err)
 	}
@@ -102,11 +109,31 @@ func SendToAPI(user, startTime, endTime string) error {
 		return fmt.Errorf("API returned unsuccessful response")
 	}
 
+	// Convert response to our model
+	result := models.CreateRecordResponse{
+		Success:   response.Success,
+		Message:   response.Message,
+		Data:      response.Data,
+		TimeSpent: response.TimeSpent,
+	}
+
+	// Handle savedToDatabase which might be a boolean or an object
+	switch v := response.SavedToDatabase.(type) {
+	case bool:
+		result.SavedToDatabase = v
+	case map[string]interface{}:
+		// If it's an object, consider it successful if it exists
+		result.SavedToDatabase = true
+	default:
+		// For any other type, default to false
+		result.SavedToDatabase = false
+	}
+
 	// Display time spent information
 	fmt.Printf("Time spent: %s (%dh %dm %ds)\n", 
-		response.TimeSpent.Formatted, 
-		response.TimeSpent.Hours,
-		response.TimeSpent.Minutes,
-		response.TimeSpent.Seconds)
+		result.TimeSpent.Formatted, 
+		result.TimeSpent.Hours,
+		result.TimeSpent.Minutes,
+		result.TimeSpent.Seconds)
 	return nil
 }
