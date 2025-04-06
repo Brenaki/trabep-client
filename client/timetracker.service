@@ -1,0 +1,13 @@
+[Unit]
+Description=Time Tracker Background Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/timetracker -background
+Restart=on-failure
+User=%u
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=multi-user.target
